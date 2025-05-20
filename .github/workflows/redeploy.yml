@@ -1,0 +1,34 @@
+name: Redeploy Specific Branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to rebuild and redeploy'
+        required: true
+        default: 'main'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout specific branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build # Adjust for your build command
+
+      - name: Deploy
+        run: npm run deploy # Adjust for your deploy command (e.g., to Vercel, Netlify)
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }} # Use GitHub Secrets for credentials
